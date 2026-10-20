@@ -20,6 +20,17 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
+      - name: Start disposable build database
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql
+          sudo service postgresql start
+          sudo -u postgres psql -v ON_ERROR_STOP=1 -c "CREATE USER ci WITH PASSWORD 'ci'"
+          sudo -u postgres createdb -O ci ci
       - run: npx prisma generate
+      - run: npx prisma db push
       - run: npx tsc --noEmit
       - run: npm run build
+      - name: Stop disposable build database
+        if: always()
+        run: sudo service postgresql stop
