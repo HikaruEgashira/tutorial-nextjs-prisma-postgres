@@ -25,8 +25,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends postgresql
           sudo service postgresql start
-          sudo -u postgres psql -v ON_ERROR_STOP=1 -c "CREATE USER ci WITH PASSWORD 'ci'"
-          sudo -u postgres createdb -O ci ci
+          sudo runuser -u postgres -- psql -v ON_ERROR_STOP=1 -c "CREATE USER ci WITH PASSWORD 'ci'"
+          sudo runuser -u postgres -- createdb -O ci ci
       - run: npx prisma generate
       - run: npx prisma db push
       - run: npx tsc --noEmit
